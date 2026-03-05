@@ -10,11 +10,10 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://www.jitpack.io' }
     }
     dependencies {
         classpath("com.android.tools.build:gradle:8.2.1")
-        classpath("com.facebook.react:react-native-gradle-plugin:0.73.2")
+        classpath("com.facebook.react:react-native-gradle-plugin:+")
     }
 }
 
@@ -22,6 +21,5 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://www.jitpack.io' }
     }
 }
