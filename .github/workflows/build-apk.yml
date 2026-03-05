@@ -33,7 +33,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./app
-        run: npm ci
+        run: npm install
 
       - name: Grant execute permission for gradlew
         working-directory: ./app/android
