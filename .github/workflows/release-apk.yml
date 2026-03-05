@@ -1,0 +1,55 @@
+name: Release APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: app/package.json
+
+      - name: Install dependencies
+        working-directory: ./app
+        run: npm ci
+
+      - name: Create Keystore
+        working-directory: ./app/android
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > friendoverlay.keystore
+        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
+
+      - name: Build Signed APK
+        working-directory: ./app/android
+        env:
+          MYAPP_UPLOAD_STORE_FILE: friendoverlay.keystore
+          MYAPP_UPLOAD_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          MYAPP_UPLOAD_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          MYAPP_UPLOAD_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: ./gradlew assembleRelease || gradle assembleRelease
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: app/android/app/build/outputs/apk/release/*.apk
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

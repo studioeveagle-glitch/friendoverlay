@@ -1,0 +1,62 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'app/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: app/package.json
+
+      - name: Install dependencies
+        working-directory: ./app
+        run: npm ci
+
+      - name: Grant execute permission for gradlew
+        working-directory: ./app/android
+        run: chmod +x gradlew || echo "gradlew not found, will use gradle wrapper"
+
+      - name: Build APK Debug
+        working-directory: ./app/android
+        run: ./gradlew assembleDebug || gradle assembleDebug
+
+      - name: Upload APK Debug
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: app/android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: ignore
+
+      - name: Build APK Release (unsigned)
+        working-directory: ./app/android
+        run: ./gradlew assembleRelease || gradle assembleRelease
+
+      - name: Upload APK Release
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-unsigned
+          path: app/android/app/build/outputs/apk/release/*.apk
+          if-no-files-found: ignore

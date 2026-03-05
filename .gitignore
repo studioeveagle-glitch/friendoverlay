@@ -1,0 +1,46 @@
+# Android
+*.iml
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+
+# Keystore
+*.keystore
+*.jks
+!debug.keystore
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# React Native
+.metro-health-check*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+coverage/
+
+# Temporary
+*.tmp
+*.temp
